@@ -1,0 +1,27 @@
+library(arules)
+library(ggplot2)
+library(readxl)
+library(utf8)
+library(tidyverse)
+library(janitor)
+
+
+ruta <- "C:\\Users\\Daniel\\Downloads\\data"   # <-- cámbiala por la tuya
+archivos <- list.files(ruta, pattern = "\\.xlsx$", full.names = TRUE)
+
+leer_limpio <- function(path){
+  read_excel(path) |> 
+    clean_names() |> 
+    mutate(source_file = basename(path))
+}
+base_unificada <- map_dfr(archivos, leer_limpio)
+
+base_unificada <- base_unificada |>
+  mutate(
+    ano = as.integer(ano),
+    mes = as.character(mes),
+    edad = as.integer(edad)
+  ) |>
+  distinct()
+
+write_csv(base_unificada, "C:\\Users\\Daniel\\Downloads\\base_unificada.csv")
